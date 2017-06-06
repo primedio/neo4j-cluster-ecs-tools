@@ -56,20 +56,36 @@
         <url>https://github.com/SteelBridgeLabs/neo4j-cluster-ecs-tools.git</url>
     </scm>
     <properties>
-        <!-- neo4j -->
-        <neo4j.version>1.0.6</neo4j.version>
-        <!-- gremlin -->
-        <gremlin.version>3.2.3</gremlin.version>
-        <!-- slf4j -->
-        <slf4j.version>1.7.21</slf4j.version>
-        <!-- logback-classic -->
-        <logback-classic.version>1.1.7</logback-classic.version>
+        <!-- aws-java-sdk-bom -->
+        <aws-java-sdk-bom.version>1.11.140</aws-java-sdk-bom.version>
         <!-- junit -->
         <junit.version>4.12</junit.version>
         <!-- mockito -->
         <mockito-all.version>1.10.19</mockito-all.version>
+        <!-- application class -->
+        <start-class>com.steelbridgelabs.oss.neo4j.cluster.ecs.AutoscalingGroupMembers</start-class>
     </properties>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-bom</artifactId>
+                <version>${aws-java-sdk-bom.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <dependencies>
+        <!-- aws -->
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-ecs</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-ec2</artifactId>
+        </dependency>
         <!-- test -->
         <dependency>
             <groupId>junit</groupId>
