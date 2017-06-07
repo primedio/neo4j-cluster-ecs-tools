@@ -41,32 +41,39 @@ import java.util.stream.Collectors;
 public class AutoscalingGroupMembers {
 
     public static void main(String[] args) {
-        // create aws ec2 client
-        AmazonEC2 client = AmazonEC2ClientBuilder.defaultClient();
-        // create request
-        DescribeInstancesRequest request = new DescribeInstancesRequest();
-        // use instance ids associated to cluster
-        request.withInstanceIds(ec2Instances("QA-ECS-Cluster"));
-        // next token
-        String token = null;
-        // instance dns
-        List<String> dns = new ArrayList<>();
-        do {
-            // set next token
-            request.setNextToken(token);
-            // describe instances
-            DescribeInstancesResult result = client.describeInstances(request);
-            // loop reservations
-            result.getReservations().forEach(reservation -> {
-                // append private dns
-                dns.addAll(reservation.getInstances().stream().map(Instance::getPrivateDnsName).collect(Collectors.toList()));
-            });
-            // check we have more data to retrieve
-            token = result.getNextToken();
+        // check arguments
+        if (args.length == 1) {
+            // create aws ec2 client
+            AmazonEC2 client = AmazonEC2ClientBuilder.defaultClient();
+            // create request
+            DescribeInstancesRequest request = new DescribeInstancesRequest();
+            // use instance ids associated to cluster
+            request.withInstanceIds(ec2Instances(args[0]));
+            // next token
+            String token = null;
+            // instance dns
+            List<String> dns = new ArrayList<>();
+            do {
+                // set next token
+                request.setNextToken(token);
+                // describe instances
+                DescribeInstancesResult result = client.describeInstances(request);
+                // loop reservations
+                result.getReservations().forEach(reservation -> {
+                    // append private dns
+                    dns.addAll(reservation.getInstances().stream().map(Instance::getPrivateDnsName).collect(Collectors.toList()));
+                });
+                // check we have more data to retrieve
+                token = result.getNextToken();
+            }
+            while (token != null);
+            // dump initial cluster members
+            System.out.print(dns.stream().map(entry -> entry + ":5000").collect(Collectors.joining(",")));
         }
-        while (token != null);
-        // dump initial cluster members
-        System.out.print(dns.stream().map(entry -> entry + ":5000").collect(Collectors.joining(",")));
+        else {
+            // show information
+            System.err.println("Invalid ECS cluster name: java -jar neo4j-cluster-ecs-tools.jar My-Cluster-Name");
+        }
     }
 
     private static List<String> containerInstanceArns(AmazonECS client, String cluster) {
