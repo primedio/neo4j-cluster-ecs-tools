@@ -56,6 +56,8 @@
         <url>https://github.com/SteelBridgeLabs/neo4j-cluster-ecs-tools.git</url>
     </scm>
     <properties>
+        <!-- java compiler -->
+        <java.version>1.8</java.version>
         <!-- aws-java-sdk-bom -->
         <aws-java-sdk-bom.version>1.11.140</aws-java-sdk-bom.version>
         <!-- junit -->
