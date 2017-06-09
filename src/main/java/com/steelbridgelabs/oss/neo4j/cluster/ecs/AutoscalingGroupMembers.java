@@ -51,8 +51,8 @@ public class AutoscalingGroupMembers {
             request.withInstanceIds(ec2Instances(args[0]));
             // next token
             String token = null;
-            // instance dns
-            List<String> dns = new ArrayList<>();
+            // instance ip addresses
+            List<String> addresses = new ArrayList<>();
             do {
                 // set next token
                 request.setNextToken(token);
@@ -60,15 +60,15 @@ public class AutoscalingGroupMembers {
                 DescribeInstancesResult result = client.describeInstances(request);
                 // loop reservations
                 result.getReservations().forEach(reservation -> {
-                    // append private dns
-                    dns.addAll(reservation.getInstances().stream().map(Instance::getPrivateDnsName).collect(Collectors.toList()));
+                    // append private ip addresses
+                    addresses.addAll(reservation.getInstances().stream().map(Instance::getPrivateIpAddress).collect(Collectors.toList()));
                 });
                 // check we have more data to retrieve
                 token = result.getNextToken();
             }
             while (token != null);
             // dump initial cluster members
-            System.out.print(dns.stream().map(entry -> entry + ":5000").collect(Collectors.joining(",")));
+            System.out.print(addresses.stream().map(entry -> entry + ":5000").collect(Collectors.joining(",")));
         }
         else {
             // show information
